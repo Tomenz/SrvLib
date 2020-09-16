@@ -1,0 +1,91 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          <NAME>
+# Required-Start:    $local_fs $network $named $time $syslog
+# Required-Stop:     $local_fs $network $named $time $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Description:       <DESCRIPTION>
+### END INIT INFO
+
+NAME=ExampleSrv
+DAEMON=/home/thomas/c++/SrvLib/$NAME
+RUNAS=root
+
+PIDDIR=/var/run/$NAME
+PIDFILE=$PIDDIR/$NAME.pid
+LOGFILE=/var/log/$NAME.log
+
+test -x $DAEMON || exit 0
+
+start() {
+  echo -n 'Starting service…' >&2
+  #install -o root -g root -m 755 -d $PIDDIR  
+  if ! start-stop-daemon --start --quiet --oknodo --exec $DAEMON --chuid $RUNAS
+  then
+    echo ' …service NICHT gestarted' >&2
+    exit 1
+  fi
+  echo ' …service started' >&2
+}
+
+stop() {
+  echo -n 'Stopping service…' >&2
+  start-stop-daemon --stop --quiet --exec $DAEMON
+  sleep 1
+  echo ' …service stopped' >&2
+}
+
+status() {
+  echo -n 'Checking…'
+  if ! start-stop-daemon --status --exec $DAEMON
+  then
+    echo ' …Service NICHT gestarted' >&2
+  else
+    echo ' …Service gestarted' >&2
+  fi
+}
+
+install() {
+  update-rc.d $NAME defaults
+}
+
+remove() {
+  update-rc.d -f $NAME remove
+}
+
+reload() {
+  echo -n 'Reload configuratione…' >&2
+  pkill -HUP $NAME
+  sleep 1
+  echo ' …configuration reloaded' >&2
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  status)
+    status
+    ;;
+  restart)
+    stop
+    start
+    ;;
+  install)
+    install
+    ;;
+  remove)
+    remove
+    ;;
+  reload)
+    reload
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|status|restart|reload|install|remove}"
+esac
+
+return 1
