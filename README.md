@@ -1,5 +1,5 @@
 # SrvLib
-A plugin library to make your console application a windows system service, or a linux deamon service
+A plugin library to make your console application a windows system service, or a linux daemon service
 
 On Windows the are commandline option to install,remove,start and stop the service.
 
@@ -17,7 +17,7 @@ On linux you have to copy the file in the init.d directory to /etc/init.d/ and r
 commanline option are:
 /etc/init.d/filename start|stop|status|restart|reload|install|remove
 
-...
+```
 #include "Service.h"
 
 int main(int argc, const char* argv[])
@@ -40,4 +40,4 @@ int main(int argc, const char* argv[])
 
     return ServiceMain(argc, argv, svParam);
 }
-...
+```
