@@ -1,6 +1,7 @@
 # SrvLib
 A plugin library to make your console application a windows system service, or a linux daemon service
 
+# Windows
 On Windows the are commandline option to install,remove,start and stop the service.
 
     -i   Install the system service
@@ -13,10 +14,12 @@ On Windows the are commandline option to install,remove,start and stop the servi
     -k   Reload configuration
     -h   Show this help
 
+# Linux
 On linux you have to copy the file in the init.d directory to /etc/init.d/ and rename it, modify the execution rights, and change the application name and the path for the application in that file.
 commanline option are:
 /etc/init.d/filename start|stop|status|restart|reload|install|remove
 
+# Example
 ```
 #include "Service.h"
 
