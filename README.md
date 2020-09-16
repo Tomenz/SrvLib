@@ -34,7 +34,7 @@ int main(int argc, const char* argv[])
     svParam.szSrvName = L"ExampleServ";                     // Service name (service id)
     svParam.fnStartCallBack = []()
     {   // Start you server here
-    }
+    };
     svParam.fnStopCallBack = []() 
     {   // Stop you server here
     };
