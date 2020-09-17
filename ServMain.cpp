@@ -29,6 +29,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <cstdlib>
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -450,11 +451,19 @@ int ServiceMain(int argc, const char* argv[], SrvParam SrvPara)
         Service::GetInstance(&SrvPara);
 
 #if !defined(_WIN32) && !defined(_WIN64)
+        function(<string(const wstring&)> fnWS2S = [](const wstring& src) -> string
+        {
+            string strDst(src.size() * 4, 0);
+            size_t nWritten = wcstombs(&strDst[0], src.c_str(), src.size() * 4);
+            strDst.resize(nWritten > 0 && nWritten < src.size() * 4 ? nWritten : 0);
+            return strDst;
+        };
+        string strSrvName = fnWS2S(SrvPara.szSrvName);
         //Set our Logging Mask and open the Log
         setlogmask(LOG_UPTO(LOG_NOTICE));
-        openlog("websockserv", LOG_CONS | LOG_NDELAY | LOG_PERROR | LOG_PID, LOG_USER);
+        openlog(strSrvName.c_str(), LOG_CONS | LOG_NDELAY | LOG_PERROR | LOG_PID, LOG_USER);
 
-        syslog(LOG_NOTICE, "Starting WebSockServ");
+        syslog(LOG_NOTICE, string("Starting " + strSrvName).c_str());
         pid_t pid, sid;
         //Fork the Parent Process
         pid = fork();
