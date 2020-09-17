@@ -19,29 +19,29 @@ LOGFILE=/var/log/$NAME.log
 test -x $DAEMON || exit 0
 
 start() {
-  echo -n 'Starting service…' >&2
+  echo -n 'starting service…' >&2
   if ! start-stop-daemon --start --quiet --oknodo --exec $DAEMON --chuid $RUNAS
   then
-    echo ' …service NICHT gestarted' >&2
+    echo ' …service not started' >&2
     exit 1
   fi
   echo ' …service started' >&2
 }
 
 stop() {
-  echo -n 'Stopping service…' >&2
+  echo -n 'stopping service…' >&2
   start-stop-daemon --stop --quiet --exec $DAEMON
   sleep 1
   echo ' …service stopped' >&2
 }
 
 status() {
-  echo -n 'Checking…'
+  echo -n 'checking…'
   if ! start-stop-daemon --status --exec $DAEMON
   then
-    echo ' …Service NICHT gestarted' >&2
+    echo ' …service not started' >&2
   else
-    echo ' …Service gestarted' >&2
+    echo ' …service started' >&2
   fi
 }
 
@@ -54,7 +54,7 @@ remove() {
 }
 
 reload() {
-  echo -n 'Reload configuratione…' >&2
+  echo -n 'reload configuratione…' >&2
   pkill -HUP $NAME
   sleep 1
   echo ' …configuration reloaded' >&2
