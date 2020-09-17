@@ -20,7 +20,6 @@ test -x $DAEMON || exit 0
 
 start() {
   echo -n 'Starting service…' >&2
-  #install -o root -g root -m 755 -d $PIDDIR  
   if ! start-stop-daemon --start --quiet --oknodo --exec $DAEMON --chuid $RUNAS
   then
     echo ' …service NICHT gestarted' >&2
@@ -47,11 +46,11 @@ status() {
 }
 
 install() {
-  update-rc.d $NAME defaults
+  update-rc.d $(basename "$0") defaults
 }
 
 remove() {
-  update-rc.d -f $NAME remove
+  update-rc.d -f $(basename "$0") remove
 }
 
 reload() {

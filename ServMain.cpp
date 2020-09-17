@@ -96,11 +96,12 @@ public:
 
         if (iSignal == SIGTERM)
             Service::GetInstance().Stop();
+#if defined(_WIN32) || defined(_WIN64)
         else if (iSignal == SIGINT)
             Service::GetInstance().CallSignalCallback();
-
-#if defined(_WIN32) || defined(_WIN64)
-        OutputDebugString(L"STRG+C-Signal empfangen\r\n");
+#else        
+        else if (iSignal == SIGHUP)
+            Service::GetInstance().CallSignalCallback();
 #endif
     }
 
@@ -185,7 +186,6 @@ int ServiceMain(int argc, const char* argv[], SrvParam SrvPara)
 #if defined(_WIN32) || defined(_WIN64)
                 case 'I':
                     iRet = CSvrCtrl().Install(SrvPara.szSrvName, SrvPara.szDspName, SrvPara.szDescrip);
-                    //CSvrCtrl().SetServiceDescription(szSrvName, szDescrip);
                     break;
                 case 'R':
                     iRet = CSvrCtrl().Remove(SrvPara.szSrvName);
@@ -217,7 +217,7 @@ int ServiceMain(int argc, const char* argv[], SrvParam SrvPara)
                     int iIndex = 0;
                     while (_kbhit() == 0)
                     {
-                        wcout << L'\r' << caZeichen[iIndex++] /*<< L"  Sockets:" << setw(3) << BaseSocket::s_atRefCount << L"  SSL-Pumpen:" << setw(3) << SslTcpSocket::s_atAnzahlPumps << L"  HTTP-Connections:" << setw(3) << nHttpCon*/ << flush;
+                        wcout << L'\r' << caZeichen[iIndex++] << flush;
                         if (iIndex > 3) iIndex = 0;
                         this_thread::sleep_for(chrono::milliseconds(100));
                     }
@@ -381,7 +381,6 @@ int ServiceMain(int argc, const char* argv[], SrvParam SrvPara)
                         {
                             strMyName.erase(strMyName.find_last_not_of('\0') + 1);
                             strMyName.erase(strMyName.find_last_not_of('\n') + 1);
-                            //wcout << "Meine PID = " << nMyId << " = " << strMyName.c_str() << endl;
                         }
                         fclose(fp);
                     }
