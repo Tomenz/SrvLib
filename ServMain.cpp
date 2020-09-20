@@ -451,7 +451,7 @@ int ServiceMain(int argc, const char* argv[], SrvParam SrvPara)
         Service::GetInstance(&SrvPara);
 
 #if !defined(_WIN32) && !defined(_WIN64)
-        function(<string(const wstring&)> fnWS2S = [](const wstring& src) -> string
+        function<string(const wstring&)> fnWS2S = [](const wstring& src) -> string
         {
             string strDst(src.size() * 4, 0);
             size_t nWritten = wcstombs(&strDst[0], src.c_str(), src.size() * 4);
