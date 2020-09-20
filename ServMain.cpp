@@ -132,7 +132,7 @@ DWORD WINAPI RemoteThreadProc(LPVOID/* lpParameter*/)
 }
 #endif
 
-int ServiceMain(int argc, const char* argv[], SrvParam SrvPara)
+int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 {
 #if defined(_WIN32) || defined(_WIN64)
     // Detect Memory Leaks
