@@ -13,14 +13,19 @@
 #include <iostream>
 #include <mutex>
 #include <signal.h>
-#include <fcntl.h>
+
+#include "Service.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #include <VersionHelpers.h>
 #include <conio.h>
-#include <io.h>
+#include "BaseSrv.h"
+#include "Srvctrl.h"
+#include "Psapi.h"
+#pragma comment(lib, "Psapi.lib")
 #else
+#include <fcntl.h>
 #include <memory>
 #include <thread>
 #include <condition_variable>
@@ -30,14 +35,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <cstdlib>
-#endif
-
-#if defined(_WIN32) || defined(_WIN64)
-#include "BaseSrv.h"
-#include "Srvctrl.h"
-#include "Psapi.h"
-#pragma comment(lib, "Psapi.lib")
-#else
 class CBaseSrv
 {
 public:
@@ -46,8 +43,6 @@ public:
     virtual void Start(void) = 0;
 };
 #endif
-
-#include "Service.h"
 
 using namespace std;
 
@@ -135,14 +130,8 @@ DWORD WINAPI RemoteThreadProc(LPVOID/* lpParameter*/)
 int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 {
 #if defined(_WIN32) || defined(_WIN64)
-    // Detect Memory Leaks
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG));
-    _setmode(_fileno(stdout), _O_U16TEXT);
-
     signal(SIGINT, Service::SignalHandler);
-
 #else
-
     signal(SIGHUP, Service::SignalHandler);
     signal(SIGTERM, Service::SignalHandler);
 
