@@ -16,18 +16,18 @@
 
 using namespace std;
 
-CSvrCtrl::CSvrCtrl(void) : m_hSCManager(nullptr)
+CSvrCtrl::CSvrCtrl(void) noexcept : m_hSCManager(nullptr)
 {
-	m_hSCManager = OpenSCManager(
-    NULL,                    // local machine
-    NULL,                    // ServicesActive database
+    m_hSCManager = OpenSCManager(
+    nullptr,                 // local machine
+    nullptr,                 // ServicesActive database
     SC_MANAGER_ALL_ACCESS);  // full access rights
 }
 
 CSvrCtrl::~CSvrCtrl(void)
 {
     if (m_hSCManager != nullptr)
-	    CloseServiceHandle(m_hSCManager);
+        CloseServiceHandle(m_hSCManager);
 }
 
 int CSvrCtrl::Install(const wchar_t* szSvrName, const wchar_t* szDisplayName, const wchar_t* szDescription/* = nullptr*/)
@@ -35,9 +35,9 @@ int CSvrCtrl::Install(const wchar_t* szSvrName, const wchar_t* szDisplayName, co
     if (SelfElevat() == true)
         return 0;
 
-	wchar_t szPath[MAX_PATH];
+    wchar_t szPath[MAX_PATH];
 
-    if(GetModuleFileName(NULL, szPath, MAX_PATH) == 0)
+    if(GetModuleFileName(nullptr, &szPath[0], MAX_PATH) == 0)
     {
 //        printf("GetModuleFileName failed (%d)\n", GetLastError());
         return -2;
@@ -45,20 +45,20 @@ int CSvrCtrl::Install(const wchar_t* szSvrName, const wchar_t* szDisplayName, co
 
     SC_HANDLE schService = CreateService(
         m_hSCManager,              // SCManager database
-        szSvrName,				   // name of service
+        szSvrName,                 // name of service
         szDisplayName,             // service name to display
         SERVICE_ALL_ACCESS,        // desired access
         SERVICE_WIN32_OWN_PROCESS, // service type
         SERVICE_AUTO_START,        // start type
         SERVICE_ERROR_NORMAL,      // error control type
-        szPath,                    // path to service's binary
-        NULL,                      // no load ordering group
-        NULL,                      // no tag identifier
-        NULL,                      // no dependencies
-        NULL,                      // LocalSystem account
-        NULL);                     // no password
+        &szPath[0],                // path to service's binary
+        nullptr,                   // no load ordering group
+        nullptr,                   // no tag identifier
+        nullptr,                   // no dependencies
+        nullptr,                   // LocalSystem account
+        nullptr);                  // no password
 
-    if (schService == NULL)
+    if (schService == nullptr)
     {
 //        printf("CreateService failed (%d)\n", GetLastError());
         return -1;
@@ -68,7 +68,7 @@ int CSvrCtrl::Install(const wchar_t* szSvrName, const wchar_t* szDisplayName, co
         CloseServiceHandle(schService);
 
         if (szDescription != nullptr)
-            SetServiceDescription(szSvrName, const_cast<wchar_t*>(szDescription));
+            SetServiceDescription(szSvrName, szDescription);
 
         return 0;
     }
@@ -84,7 +84,7 @@ int CSvrCtrl::Remove(const wchar_t* szSvrName)
         szSvrName,          // name of service
         DELETE);            // only need DELETE access
 
-    if (schService == NULL)
+    if (schService == nullptr)
     {
 //        printf("OpenService failed (%d)\n", GetLastError());
         return -3;
@@ -93,7 +93,7 @@ int CSvrCtrl::Remove(const wchar_t* szSvrName)
     if (DeleteService(schService) == 0)
     {
 //        printf("DeleteService failed (%d)\n", GetLastError());
-		CloseServiceHandle(schService);
+        CloseServiceHandle(schService);
         return -4;
     }
 
@@ -107,22 +107,22 @@ int CSvrCtrl::Start(const wchar_t* szSvrName)
     if (SelfElevat() == true)
         return 0;
 
-	SC_HANDLE schService;
-    SERVICE_STATUS_PROCESS ssStatus;
-    DWORD dwOldCheckPoint;
-    DWORD dwStartTickCount;
-    DWORD dwBytesNeeded;
+    SC_HANDLE schService = nullptr;
+    SERVICE_STATUS_PROCESS ssStatus = { 0 };
+    DWORD dwOldCheckPoint = 0;
+    DWORD dwStartTickCount = 0;
+    DWORD dwBytesNeeded = 0;
 
     schService = OpenService(m_hSCManager, szSvrName, SERVICE_ALL_ACCESS);
 
-    if (schService == NULL)
+    if (schService == nullptr)
         return -5;
 
-    if (StartService(schService, 0, NULL) == 0)
-	{
-		CloseServiceHandle(schService);
+    if (StartService(schService, 0, nullptr) == 0)
+    {
+        CloseServiceHandle(schService);
         return 6;
-	}
+    }
 
     // Check the status until the service is no longer start pending.
 
@@ -133,7 +133,7 @@ int CSvrCtrl::Start(const wchar_t* szSvrName)
             sizeof(SERVICE_STATUS_PROCESS), // size of structure
             &dwBytesNeeded ) )              // if buffer too small
     {
-		CloseServiceHandle(schService);
+        CloseServiceHandle(schService);
         return 0;
     }
 
@@ -159,7 +159,7 @@ int CSvrCtrl::Start(const wchar_t* szSvrName)
 
         // Check the status again.
 
-		if (!QueryServiceStatusEx(
+        if (!QueryServiceStatusEx(
             schService,             // handle to service
             SC_STATUS_PROCESS_INFO, // info level
             (LPBYTE)&ssStatus,              // address of structure
@@ -189,7 +189,7 @@ int CSvrCtrl::Start(const wchar_t* szSvrName)
     if (ssStatus.dwCurrentState == SERVICE_RUNNING)
         return 1;
 
-	return 0;
+    return 0;
 }
 
 int CSvrCtrl::Stop(const wchar_t* szSvrName)
@@ -199,13 +199,13 @@ int CSvrCtrl::Stop(const wchar_t* szSvrName)
 
     SC_HANDLE schService = OpenService(m_hSCManager, szSvrName, SERVICE_ALL_ACCESS);
 
-    if (schService == NULL)
+    if (schService == nullptr)
         return -5;
 
-	DWORD dwError = 0;
-	SERVICE_STATUS ssStatus;
-	if (ControlService(schService, SERVICE_CONTROL_STOP, &ssStatus) == 0)
-		dwError = GetLastError();
+    DWORD dwError = 0;
+    SERVICE_STATUS ssStatus;
+    if (ControlService(schService, SERVICE_CONTROL_STOP, &ssStatus) == 0)
+        dwError = GetLastError();
 
     CloseServiceHandle(schService);
     return dwError;
@@ -218,13 +218,13 @@ int CSvrCtrl::Pause(const wchar_t* szSvrName)
 
     SC_HANDLE schService = OpenService(m_hSCManager, szSvrName, SERVICE_ALL_ACCESS);
 
-    if (schService == NULL)
+    if (schService == nullptr)
         return -5;
 
-	DWORD dwError = 0;
-	SERVICE_STATUS ssStatus;
-	if (ControlService(schService, SERVICE_CONTROL_PAUSE, &ssStatus) == 0)
-		dwError = GetLastError();
+    DWORD dwError = 0;
+    SERVICE_STATUS ssStatus;
+    if (ControlService(schService, SERVICE_CONTROL_PAUSE, &ssStatus) == 0)
+        dwError = GetLastError();
 
     CloseServiceHandle(schService);
     return dwError;
@@ -237,25 +237,25 @@ int CSvrCtrl::Continue(const wchar_t* szSvrName)
 
     SC_HANDLE schService = OpenService(m_hSCManager, szSvrName, SERVICE_ALL_ACCESS);
 
-    if (schService == NULL)
+    if (schService == nullptr)
         return -5;
 
-	DWORD dwError = 0;
-	SERVICE_STATUS ssStatus;
-	if (ControlService(schService, SERVICE_CONTROL_CONTINUE, &ssStatus) == 0)
-		dwError = GetLastError();
+    DWORD dwError = 0;
+    SERVICE_STATUS ssStatus;
+    if (ControlService(schService, SERVICE_CONTROL_CONTINUE, &ssStatus) == 0)
+        dwError = GetLastError();
 
     CloseServiceHandle(schService);
     return dwError;
 }
 
-bool CSvrCtrl::SetServiceDescription(const wchar_t* szSvrName, wchar_t* szDescription)
+bool CSvrCtrl::SetServiceDescription(const wchar_t* szSvrName, const wchar_t* szDescription) noexcept
 {
     // Need to acquire database lock before reconfiguring.
     SC_LOCK sclLock = LockServiceDatabase(m_hSCManager);
 
     // If the database cannot be locked, report the details.
-    if (sclLock == NULL)
+    if (sclLock == nullptr)
     {
         // Exit if the database is not locked by another process.
 
@@ -266,14 +266,14 @@ bool CSvrCtrl::SetServiceDescription(const wchar_t* szSvrName, wchar_t* szDescri
 
         // Allocate a buffer to get details about the lock.
 
-        LPQUERY_SERVICE_LOCK_STATUS lpqslsBuf = (LPQUERY_SERVICE_LOCK_STATUS) LocalAlloc(LPTR, sizeof(QUERY_SERVICE_LOCK_STATUS) + 256);
-        if (lpqslsBuf == NULL)
+        LPQUERY_SERVICE_LOCK_STATUS lpqslsBuf = static_cast<LPQUERY_SERVICE_LOCK_STATUS>(LocalAlloc(LPTR, sizeof(QUERY_SERVICE_LOCK_STATUS) + 256));
+        if (lpqslsBuf == nullptr)
         {
             return false;
         }
 
         // Get and print the lock status information.
-		DWORD dwBytesNeeded;
+        DWORD dwBytesNeeded;
         if (!QueryServiceLockStatus(m_hSCManager, lpqslsBuf, sizeof(QUERY_SERVICE_LOCK_STATUS) + 256, &dwBytesNeeded))
         {
             return FALSE;
@@ -283,21 +283,21 @@ bool CSvrCtrl::SetServiceDescription(const wchar_t* szSvrName, wchar_t* szDescri
     }
 
     // The database is locked, so it is safe to make changes.
-	bool bRet = true;
+    bool bRet = true;
 
     // Open a handle to the service.
-	SC_HANDLE schService = OpenService(m_hSCManager, szSvrName, SERVICE_CHANGE_CONFIG);	// need CHANGE access
-    if (schService == NULL)
+    SC_HANDLE schService = OpenService(m_hSCManager, szSvrName, SERVICE_CHANGE_CONFIG); // need CHANGE access
+    if (schService == nullptr)
     {
-		// Release the database lock.
-		UnlockServiceDatabase(sclLock);
+        // Release the database lock.
+        UnlockServiceDatabase(sclLock);
         return false;
     }
 
     SERVICE_DESCRIPTION sdBuf;
-    sdBuf.lpDescription = szDescription;
+    sdBuf.lpDescription = const_cast<wchar_t*>(szDescription);
 
-    if( !ChangeServiceConfig2(schService, SERVICE_CONFIG_DESCRIPTION, &sdBuf))	// value: new description
+    if( !ChangeServiceConfig2(schService, SERVICE_CONFIG_DESCRIPTION, &sdBuf))  // value: new description
     {
         bRet = false;
     }
@@ -306,7 +306,7 @@ bool CSvrCtrl::SetServiceDescription(const wchar_t* szSvrName, wchar_t* szDescri
     UnlockServiceDatabase(sclLock);
 
     // Close the handle to the service.
-	CloseServiceHandle(schService);
+    CloseServiceHandle(schService);
 
     return bRet;
 }
@@ -318,9 +318,9 @@ bool CSvrCtrl::SelfElevat()
         return false;
 
     // check if elevated on Vista and 7
-    HANDLE Token;
-    TOKEN_ELEVATION Elevation;      // Token type only available with Vista/7
-    DWORD ReturnSize;
+    HANDLE Token = nullptr;
+    TOKEN_ELEVATION Elevation = { 0 };  // Token type only available with Vista/7
+    DWORD ReturnSize = 0;
 
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_READ, &Token) ||
         !GetTokenInformation(Token, TokenElevation, &Elevation, sizeof(Elevation), &ReturnSize))
@@ -330,7 +330,7 @@ bool CSvrCtrl::SelfElevat()
         return false;
 
     wstring FileName(MAX_PATH, 0);
-    GetModuleFileName(NULL, &FileName[0], MAX_PATH);
+    GetModuleFileName(nullptr, &FileName[0], MAX_PATH);
     FileName.erase(FileName.find_first_of(L'\0'));
     wstring pStrCmdLine = GetCommandLine();
 
@@ -342,16 +342,16 @@ bool CSvrCtrl::SelfElevat()
     }
 
     SHELLEXECUTEINFO Info;
-    Info.hwnd = NULL;
+    Info.hwnd = nullptr;
     Info.cbSize = sizeof(Info);
-    Info.fMask = NULL;
-    Info.hwnd = NULL;
+    Info.fMask = 0;
+    Info.hwnd = nullptr;
     Info.lpVerb = L"runas";
     Info.lpFile = &FileName[0];
     Info.lpParameters = &pStrCmdLine[0];
-    Info.lpDirectory = NULL;
+    Info.lpDirectory = nullptr;
     Info.nShow = 0;// SW_HIDE;
-    Info.hInstApp = NULL;
+    Info.hInstApp = nullptr;
     while (!ShellExecuteEx(&Info));
 
     return true;

@@ -56,7 +56,7 @@ public:
         return *s_pInstance.get();
     }
 
-    virtual void Start(void)
+    void Start(void) override
     {
         m_bIsStopped = false;
 
@@ -72,7 +72,7 @@ public:
         m_bIsStopped = true;
     };
 
-    virtual void Stop(void)
+    void Stop(void) noexcept override
     {
         m_bStop = true;
         m_cvStop.notify_all();
@@ -84,7 +84,7 @@ public:
             fnSignalCallBack();
     }
 
-    bool IsStopped(void) { return m_bIsStopped; }
+    bool IsStopped(void) noexcept { return m_bIsStopped; }
 
     static void SignalHandler(int iSignal)
     {
@@ -95,14 +95,14 @@ public:
 #if defined(_WIN32) || defined(_WIN64)
         else if (iSignal == SIGINT)
             Service::GetInstance().CallSignalCallback();
-#else        
+#else
         else if (iSignal == SIGHUP)
             Service::GetInstance().CallSignalCallback();
 #endif
     }
 
 private:
-    explicit Service(const SrvParam* SrvPara) : CBaseSrv(SrvPara->szSrvName), m_bStop(false), m_bIsStopped(true), 
+    explicit Service(const SrvParam* SrvPara) : CBaseSrv(SrvPara->szSrvName), m_bStop(false), m_bIsStopped(true),
         fnStartCallBack(SrvPara->fnStartCallBack), fnStopCallBack(SrvPara->fnStopCallBack), fnSignalCallBack(SrvPara->fnSignalCallBack) { }
 
 private:
@@ -121,7 +121,7 @@ shared_ptr<Service> Service::s_pInstance = nullptr;
 
 
 #if defined(_WIN32) || defined(_WIN64)
-DWORD WINAPI RemoteThreadProc(LPVOID/* lpParameter*/)
+DWORD WINAPI RemoteThreadProc(LPVOID/* lpParameter*/) noexcept
 {
     return raise(SIGINT);
 }
@@ -226,9 +226,9 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                             return false;
 
                         // check if elevated on Vista and 7
-                        HANDLE Token;
-                        TOKEN_ELEVATION Elevation;      // Token type only available with Vista/7
-                        DWORD ReturnSize;
+                        HANDLE Token = nullptr;
+                        TOKEN_ELEVATION Elevation = { 0 };  // Token type only available with Vista/7
+                        DWORD ReturnSize = 0;
 
                         if (!OpenProcessToken(GetCurrentProcess(), TOKEN_READ, &Token) ||
                             !GetTokenInformation(Token, TokenElevation, &Elevation, sizeof(Elevation), &ReturnSize))
@@ -238,7 +238,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                             return false;
 
                         wstring FileName(MAX_PATH, 0);
-                        GetModuleFileName(NULL, &FileName[0], MAX_PATH);
+                        GetModuleFileName(nullptr, &FileName[0], MAX_PATH);
                         FileName.erase(FileName.find_first_of(L'\0'));
                         wstring pStrCmdLine = GetCommandLine();
 
@@ -250,16 +250,16 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                         }
 
                         SHELLEXECUTEINFO Info;
-                        Info.hwnd = NULL;
+                        Info.hwnd = nullptr;
                         Info.cbSize = sizeof(Info);
-                        Info.fMask = NULL;
-                        Info.hwnd = NULL;
+                        Info.fMask = 0;
+                        Info.hwnd = nullptr;
                         Info.lpVerb = L"runas";
                         Info.lpFile = &FileName[0];
                         Info.lpParameters = &pStrCmdLine[0];
-                        Info.lpDirectory = NULL;
+                        Info.lpDirectory = nullptr;
                         Info.nShow = 0;// SW_HIDE;
-                        Info.hInstApp = NULL;
+                        Info.hInstApp = nullptr;
                         while (!ShellExecuteEx(&Info));
 
                         return true;
@@ -269,12 +269,12 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
                     function <bool()> AdjustTocken = []() -> bool
                     {
-                        TOKEN_PRIVILEGES tp;
+                        TOKEN_PRIVILEGES tp = { 0 };
                         LUID luid;
 
-                        if (!LookupPrivilegeValue( NULL,            // lookup privilege on local system
-                                                   L"SeDebugPrivilege",   // privilege to lookup 
-                                                   &luid))        // receives LUID of privilege
+                        if (!LookupPrivilegeValue( nullptr,             // lookup privilege on local system
+                                                   L"SeDebugPrivilege", // privilege to lookup
+                                                   &luid))              // receives LUID of privilege
                         {
                             wcout << L"LookupPrivilegeValue error: " << GetLastError() << L"\r\n";
                             return false;
@@ -289,7 +289,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                         HANDLE ProcessHandle = GetCurrentProcess();
                         HANDLE TokenHandle;
                         OpenProcessToken(ProcessHandle, TOKEN_ALL_ACCESS, &TokenHandle);
-                        BOOL bRes = AdjustTokenPrivileges(TokenHandle, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)nullptr, (PDWORD)nullptr);
+                        const BOOL bRes = AdjustTokenPrivileges(TokenHandle, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr));
                         CloseHandle(TokenHandle);
 
                         if (!bRes)
@@ -309,7 +309,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                         break;
 
                     wstring strPath(MAX_PATH, 0);
-                    GetModuleFileName(NULL, &strPath[0], MAX_PATH);
+                    GetModuleFileName(nullptr, &strPath[0], MAX_PATH);
                     strPath.erase(strPath.find_first_of(L'\0'));
                     strPath.erase(0, strPath.find_last_of(L'\\') + 1);
 
@@ -331,10 +331,10 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                             for (DWORD n = 0; n < dwIdReturned; ++n)
                             {
                                 HANDLE hProcess = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ, FALSE, pBuffer.get()[n]);
-                                if (hProcess != NULL)
+                                if (hProcess != nullptr)
                                 {
                                     wstring strEnumPath(MAX_PATH, 0);
-                                    if (GetModuleBaseName(hProcess, NULL, &strEnumPath[0], MAX_PATH) > 0)
+                                    if (GetModuleBaseName(hProcess, nullptr, &strEnumPath[0], MAX_PATH) > 0)
                                         strEnumPath.erase(strEnumPath.find_first_of(L'\0'));
                                     else
                                     {

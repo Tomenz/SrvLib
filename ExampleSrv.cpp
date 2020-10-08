@@ -38,7 +38,7 @@ int main(int argc, const char* argv[])
     {
         m_strModulePath = std::wstring(FILENAME_MAX, 0);
 #if defined(_WIN32) || defined(_WIN64)
-        if (GetModuleFileName(NULL, &m_strModulePath[0], FILENAME_MAX) > 0)
+        if (GetModuleFileName(nullptr, &m_strModulePath[0], FILENAME_MAX) > 0)
             m_strModulePath.erase(m_strModulePath.find_last_of(L'\\') + 1); // Sollte der Backslash nicht gefunden werden wird der ganz String gelöscht
 
         if (_wchdir(m_strModulePath.c_str()) != 0)
@@ -58,12 +58,12 @@ int main(int argc, const char* argv[])
         // Start you server here
         //syslog(LOG_NOTICE, "StartCallBack called ");
     };
-    svParam.fnStopCallBack = []() 
+    svParam.fnStopCallBack = []() noexcept
     {
         // Stop you server here
         //syslog(LOG_NOTICE, "StopCallBack called ");
     };
-    svParam.fnSignalCallBack = []()
+    svParam.fnSignalCallBack = []() noexcept
     {
         // what ever you do with this callback, maybe reload the configuration
 #if defined(_WIN32) || defined(_WIN64)
