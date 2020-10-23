@@ -19,6 +19,10 @@ class CSvrCtrl
 public:
     CSvrCtrl(void) noexcept;
     ~CSvrCtrl(void);
+    CSvrCtrl(const CSvrCtrl&) = delete;
+    CSvrCtrl(CSvrCtrl&&) = delete;
+    CSvrCtrl& operator=(const CSvrCtrl&) = delete;
+    CSvrCtrl& operator=(CSvrCtrl&&) = delete;
 
     int Install(const wchar_t* szSvrName, const wchar_t* szDisplayName, const wchar_t* szDescription = nullptr);
     int Remove(const wchar_t* szSvrName);

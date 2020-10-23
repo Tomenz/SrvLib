@@ -41,6 +41,7 @@ public:
     explicit CBaseSrv(const wchar_t*) {}
     virtual int Run(void) { Start(); return 0; }
     virtual void Start(void) = 0;
+    virtual void Stop(void) = 0;
 };
 #endif
 
@@ -52,8 +53,8 @@ public:
     static Service& GetInstance(const SrvParam* SrvPara = nullptr)
     {
         if (s_pInstance == 0)
-            s_pInstance.reset(new Service(SrvPara));
-        return *s_pInstance.get();
+            s_pInstance = Service::factory(SrvPara);
+        return *s_pInstance;
     }
 
     void Start(void) override
@@ -70,7 +71,7 @@ public:
             fnStopCallBack();
 
         m_bIsStopped = true;
-    };
+    }
 
     void Stop(void) noexcept override
     {
@@ -101,12 +102,22 @@ public:
 #endif
     }
 
+    static unique_ptr<Service> factory(const SrvParam* SrvPara = nullptr)
+    {
+        struct EnableMaker : public Service
+        {
+            EnableMaker(const SrvParam* SrvPara = nullptr) : Service(SrvPara) {}
+            using Service::Service;
+        };
+        return make_unique<EnableMaker>(SrvPara);
+    }
+
 private:
     explicit Service(const SrvParam* SrvPara) : CBaseSrv(SrvPara->szSrvName), m_bStop(false), m_bIsStopped(true),
         fnStartCallBack(SrvPara->fnStartCallBack), fnStopCallBack(SrvPara->fnStopCallBack), fnSignalCallBack(SrvPara->fnSignalCallBack) { }
 
 private:
-    static shared_ptr<Service> s_pInstance;
+    static unique_ptr<Service> s_pInstance;
     bool m_bStop;
     bool m_bIsStopped;
     mutex              m_mxStop;
@@ -117,7 +128,7 @@ private:
 
 };
 
-shared_ptr<Service> Service::s_pInstance = nullptr;
+unique_ptr<Service> Service::s_pInstance;
 
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -330,7 +341,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
                             for (DWORD n = 0; n < dwIdReturned; ++n)
                             {
-                                HANDLE hProcess = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ, FALSE, pBuffer.get()[n]);
+                                HANDLE hProcess = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ, FALSE, pBuffer[n]);
                                 if (hProcess != nullptr)
                                 {
                                     wstring strEnumPath(MAX_PATH, 0);
@@ -344,7 +355,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
                                     if (strEnumPath.empty() == false && strEnumPath == strPath) // Same Name
                                     {
-                                        if (GetCurrentProcessId() != pBuffer.get()[n])          // but other process
+                                        if (GetCurrentProcessId() != pBuffer[n])                // but other process
                                         {
                                             HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, RemoteThreadProc, nullptr, 0, nullptr);
                                             CloseHandle(hProcess);

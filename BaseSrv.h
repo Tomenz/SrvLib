@@ -22,6 +22,11 @@ class CBaseSrv
 public:
     explicit CBaseSrv(const wchar_t* szSrvName);
     virtual ~CBaseSrv(void);
+    CBaseSrv() = delete;
+    CBaseSrv(const CBaseSrv&) = delete;
+    CBaseSrv(CBaseSrv&&) = delete;
+    CBaseSrv& operator=(const CBaseSrv&) = delete;
+    CBaseSrv& operator=(CBaseSrv&&) = delete;
     int Run(void) noexcept;
 
     static void WINAPI ServiceStartCB(DWORD argc, LPTSTR *argv);
@@ -29,7 +34,7 @@ public:
 
     virtual int  Init(void) noexcept { return 1;}
     virtual void Start(void) = 0;
-    virtual void Stop(void)  = 0;
+    virtual void Stop(void) = 0;
     virtual void Pause(void) noexcept {;}
     virtual void Continue(void) noexcept {;}
 
