@@ -4,7 +4,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/73915c0f4be040198b0ebdd0466f34b9)](https://app.codacy.com/gh/Tomenz/SrvLib?utm_source=github.com&utm_medium=referral&utm_content=Tomenz/SrvLib&utm_campaign=Badge_Grade)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/Tomenz/SrvLib.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Tomenz/SrvLib/alerts/)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/Tomenz/SrvLib.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Tomenz/SrvLib/context:cpp)
-
+[![Build status](https://ci.appveyor.com/api/projects/status/871d8ynr5qwu589h?svg=true)](https://ci.appveyor.com/project/Tomenz/srvlib)
 
 A plugin library to make your console application a windows system service, or a linux daemon service
 
