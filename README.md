@@ -1,4 +1,7 @@
 # SrvLib
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/73915c0f4be040198b0ebdd0466f34b9)](https://app.codacy.com/gh/Tomenz/SrvLib?utm_source=github.com&utm_medium=referral&utm_content=Tomenz/SrvLib&utm_campaign=Badge_Grade)
+
 A plugin library to make your console application a windows system service, or a linux daemon service
 
 # Windows
