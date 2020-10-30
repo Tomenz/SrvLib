@@ -1,0 +1,8 @@
+version: 1.0.{build}
+configuration: Release
+platform: x64
+environment:
+  OpenSSL_Home: C:\OpenSSL-v111-Win64\
+build:
+  project: SrvLib.vcxproj
+  verbosity: minimal
