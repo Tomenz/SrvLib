@@ -21,7 +21,7 @@
 #include <VersionHelpers.h>
 #include <conio.h>
 #include "BaseSrv.h"
-#include "Srvctrl.h"
+#include "SrvCtrl.h"
 #include "Psapi.h"
 #pragma comment(lib, "Psapi.lib")
 #else
@@ -510,4 +510,3 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
     return iRet;
 }
-
