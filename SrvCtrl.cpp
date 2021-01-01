@@ -11,7 +11,7 @@
 */
 
 #include <string>
-#include ".\srvctrl.h"
+#include "SrvCtrl.h"
 #include <VersionHelpers.h>
 
 using namespace std;

@@ -10,7 +10,7 @@
    Email:   Thomas@fam-hauck.de
 */
 
-#include ".\baseSrv.h"
+#include "BaseSrv.h"
 
 wstring               CBaseSrv::s_strSrvName;
 SERVICE_STATUS        CBaseSrv::s_stSrvStatus;

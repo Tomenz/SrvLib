@@ -13,14 +13,14 @@ set(targetSrc
         ${CMAKE_CURRENT_LIST_DIR}/ServMain.cpp
 )
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") OR WIN32)
 list(APPEND targetSrc
         ${CMAKE_CURRENT_LIST_DIR}/SrvCtrl.cpp
         ${CMAKE_CURRENT_LIST_DIR}/BaseSrv.cpp
 )
 endif()
 
-add_library(SrvLib STATIC ${targetSrc})
+add_library(srvlib STATIC ${targetSrc})
 
-install(TARGETS SrvLib DESTINATION lib)
+install(TARGETS srvlib DESTINATION lib)
 #install(FILES SocketLib.h DESTINATION include)
