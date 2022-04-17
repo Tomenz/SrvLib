@@ -6,8 +6,14 @@ ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(SUPPORTED_CXX_STANDARDS 14 17)
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  message(STATUS "Setting C++ version to '14' as none was specified.")
+  set(CMAKE_CXX_STANDARD 14)
+else()
+  message(STATUS "CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD} set by parent project.")
+endif()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(targetSrc
         ${CMAKE_CURRENT_LIST_DIR}/ServMain.cpp

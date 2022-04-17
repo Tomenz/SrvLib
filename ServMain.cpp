@@ -11,7 +11,10 @@
 */
 
 #include <iostream>
+#include <memory>
 #include <mutex>
+#include <condition_variable>
+#include <thread>
 #include <signal.h>
 
 #include "Service.h"
@@ -225,7 +228,8 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
                     wcout << SrvPara.szSrvName << L" stopped" << endl;
                     Service::GetInstance().Stop();
-                    th.join();
+                    if (th.joinable() == true)
+                        th.join();
                 }
                 break;
                 case 'K':
