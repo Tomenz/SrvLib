@@ -9,7 +9,7 @@
 A plugin library to make your console application a windows system service, or a linux daemon service
 
 # Windows
-On Windows the are commandline option to install,remove,start and stop the service.
+On Windows there are commandline option to install,remove,start and stop the service.
 
     -i   Install the system service
     -r   Removes the system service
