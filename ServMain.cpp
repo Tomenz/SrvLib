@@ -467,10 +467,10 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
         setlogmask(LOG_UPTO(LOG_NOTICE));
         openlog(strSrvName.c_str(), LOG_CONS | LOG_NDELAY | LOG_PERROR | LOG_PID, LOG_USER);
 
-        syslog(LOG_NOTICE, string("Starting " + strSrvName).c_str());
-        pid_t pid, sid;
+        syslog(LOG_NOTICE, "%s", string("Starting " + strSrvName).c_str());
+
         //Fork the Parent Process
-        pid = fork();
+        pid_t pid = fork();
 
         if (pid < 0)
             exit(EXIT_FAILURE);
@@ -480,7 +480,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
             exit(EXIT_SUCCESS);
 
         //Create a new Signature Id for our child
-        sid = setsid();
+        pid_t sid = setsid();
         if (sid < 0)
             exit(EXIT_FAILURE);
 
@@ -502,14 +502,11 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
         close(STDOUT_FILENO);
         close(STDERR_FILENO);
 
-        thread([&]()
-        {
-            while (Service::GetInstance().IsStopped() == false)
-                this_thread::sleep_for(chrono::milliseconds(100));
-        }).detach();
 
 #endif
         iRet = Service::GetInstance().Run();
+
+        syslog(LOG_NOTICE, "%s", string(strSrvName + " gestoppt").c_str());
     }
 
     return iRet;
