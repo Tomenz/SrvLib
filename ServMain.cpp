@@ -502,11 +502,10 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
         close(STDOUT_FILENO);
         close(STDERR_FILENO);
 
-
+        syslog(LOG_NOTICE, "%s", string(strSrvName + " gestoppt").c_str());
 #endif
         iRet = Service::GetInstance().Run();
 
-        syslog(LOG_NOTICE, "%s", string(strSrvName + " gestoppt").c_str());
     }
 
     return iRet;
