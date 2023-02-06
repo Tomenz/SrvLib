@@ -5,7 +5,7 @@ typedef struct
 {
 #if defined(_WIN32) || defined(_WIN64)
     const wchar_t* szDspName;
-    const wchar_t* szDescrip;
+    const wchar_t* szDescribe;
 #endif
     const wchar_t* szSrvName;
     std::function<void()> fnStartCallBack;
