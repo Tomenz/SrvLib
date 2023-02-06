@@ -42,6 +42,7 @@ class CBaseSrv
 {
 public:
     explicit CBaseSrv(const wchar_t*) {}
+    virtual ~CBaseSrv() {}
     virtual int Run(void) { Start(); return 0; }
     virtual void Start(void) = 0;
     virtual void Stop(void) = 0;
@@ -189,7 +190,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                 {
 #if defined(_WIN32) || defined(_WIN64)
                 case 'I':
-                    iRet = CSvrCtrl().Install(SrvPara.szSrvName, SrvPara.szDspName, SrvPara.szDescrip);
+                    iRet = CSvrCtrl().Install(SrvPara.szSrvName, SrvPara.szDspName, SrvPara.szDescribe);
                     break;
                 case 'R':
                     iRet = CSvrCtrl().Remove(SrvPara.szSrvName);
@@ -235,7 +236,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                 case 'K':
                 {
 #if defined(_WIN32) || defined(_WIN64)
-                    function <bool()> IsEleavate = []() -> bool
+                    function <bool()> IsElevated = []() -> bool
                     {
                         if (!IsWindowsVistaOrGreater())
                             return false;
@@ -279,10 +280,10 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
                         return true;
                     };
-                    if (IsEleavate() == true)
+                    if (IsElevated() == true)
                         break;
 
-                    function <bool()> AdjustTocken = []() -> bool
+                    function <bool()> AdjustToken = []() -> bool
                     {
                         TOKEN_PRIVILEGES tp = { 0 };
                         LUID luid;
@@ -320,7 +321,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                         }
                         return true;
                     };
-                    if (AdjustTocken() == false)
+                    if (AdjustToken() == false)
                         break;
 
                     wstring strPath(MAX_PATH, 0);
