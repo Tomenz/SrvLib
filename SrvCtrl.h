@@ -10,7 +10,8 @@
    Email:   Thomas@fam-hauck.de
 */
 
-#pragma once
+#ifndef SVRCTRL_H
+#define SVRCTRL_H
 
 #include <windows.h>
 
@@ -38,3 +39,5 @@ private:
 private:
     SC_HANDLE m_hSCManager;
 };
+
+#endif // !SVRCTRL_H

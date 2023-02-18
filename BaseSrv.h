@@ -10,7 +10,8 @@
    Email:   Thomas@fam-hauck.de
 */
 
-#pragma once
+#ifndef BASESRV_H
+#define BASESRV_H
 
 #include "windows.h"
 #include <string>
@@ -44,3 +45,5 @@ private:
     static SERVICE_STATUS_HANDLE s_hSrvStatus;
     static CBaseSrv*             s_This;
 };
+
+#endif // !BASESRV_H

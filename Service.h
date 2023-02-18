@@ -1,4 +1,7 @@
-#pragma once
+
+#ifndef SERVICE_H
+#define SERVICE_H
+
 #include <functional>
 
 typedef struct
@@ -14,3 +17,5 @@ typedef struct
 }SrvParam;
 
 int ServiceMain(int argc, const char* argv[], const SrvParam& SvPara);
+
+#endif // !SERVICE_H

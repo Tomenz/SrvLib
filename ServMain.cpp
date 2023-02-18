@@ -26,7 +26,6 @@
 #include "BaseSrv.h"
 #include "SrvCtrl.h"
 #include "Psapi.h"
-#pragma comment(lib, "Psapi.lib")
 #else
 #include <fcntl.h>
 #include <memory>
@@ -56,7 +55,7 @@ class Service : public CBaseSrv
 public:
     static Service& GetInstance(const SrvParam* SrvPara = nullptr)
     {
-        if (s_pInstance == 0)
+        if (s_pInstance == nullptr)
             s_pInstance = Service::factory(SrvPara);
         return *s_pInstance;
     }
@@ -178,7 +177,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
     };
 #endif
 
-    int iRet = 0;
+    int iRet{0};
 
     if (argc > 1)
     {
@@ -219,7 +218,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                     });
 
                     const wchar_t caZeichen[] = L"\\|/-";
-                    int iIndex = 0;
+                    int iIndex{0};
                     while (_kbhit() == 0)
                     {
                         wcout << L'\r' << caZeichen[iIndex++] << flush;
@@ -242,9 +241,9 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                             return false;
 
                         // check if elevated on Vista and 7
-                        HANDLE Token = nullptr;
-                        TOKEN_ELEVATION Elevation = { 0 };  // Token type only available with Vista/7
-                        DWORD ReturnSize = 0;
+                        HANDLE Token{nullptr};
+                        TOKEN_ELEVATION Elevation{0};  // Token type only available with Vista/7
+                        DWORD ReturnSize{0};
 
                         if (!OpenProcessToken(GetCurrentProcess(), TOKEN_READ, &Token) ||
                             !GetTokenInformation(Token, TokenElevation, &Elevation, sizeof(Elevation), &ReturnSize))
@@ -285,8 +284,8 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
                     function <bool()> AdjustToken = []() -> bool
                     {
-                        TOKEN_PRIVILEGES tp = { 0 };
-                        LUID luid;
+                        TOKEN_PRIVILEGES tp{0,{{{0,0},0}}};
+                        LUID luid{0,0};
 
                         if (!LookupPrivilegeValue( nullptr,             // lookup privilege on local system
                                                    L"SeDebugPrivilege", // privilege to lookup
@@ -331,8 +330,8 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
                     if (strPath.empty() == false)
                     {
-                        DWORD dwInitSize = 1024;
-                        DWORD dwIdReturned = 0;
+                        DWORD dwInitSize{1024};
+                        DWORD dwIdReturned{0};
                         unique_ptr<DWORD[]> pBuffer = make_unique<DWORD[]>(dwInitSize);
                         while (dwInitSize < 16384 && EnumProcesses(pBuffer.get(), sizeof(DWORD) * dwInitSize, &dwIdReturned) != 0)
                         {
