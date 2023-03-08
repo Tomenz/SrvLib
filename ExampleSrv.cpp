@@ -28,7 +28,7 @@ int main(int argc, const char* argv[])
     SrvParam svParam;
 #if defined(_WIN32) || defined(_WIN64)
     svParam.szDspName = L"Example Service";                 // Servicename in Service control manager of windows
-    svParam.szDescrip = L"Example Service by your name";    // Description in Service control manager of windows
+    svParam.szDescribe = L"Example Service by your name";    // Description in Service control manager of windows
 #endif
     svParam.szSrvName = L"ExampleServ";                     // Service name (service id)
 

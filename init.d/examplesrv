@@ -9,7 +9,7 @@
 ### END INIT INFO
 
 NAME=ExampleSrv
-DAEMON=/home/thomas/c++/SrvLib/$NAME
+DAEMON=/home/thomas/c++/SrvLib/build/$NAME
 RUNAS=root
 
 PIDDIR=/var/run/$NAME

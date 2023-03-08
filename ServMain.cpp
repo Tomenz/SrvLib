@@ -452,8 +452,6 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
     }
     else
     {
-        Service::GetInstance(&SrvPara);
-
 #if !defined(_WIN32) && !defined(_WIN64)
         function<string(const wstring&)> fnWS2S = [](const wstring& src) -> string
         {
@@ -504,6 +502,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
         syslog(LOG_NOTICE, "%s", string(strSrvName + " gestoppt").c_str());
 #endif
+        Service::GetInstance(&SrvPara);
         iRet = Service::GetInstance().Run();
 
     }
