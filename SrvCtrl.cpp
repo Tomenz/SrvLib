@@ -16,12 +16,11 @@
 
 using namespace std;
 
-CSvrCtrl::CSvrCtrl(void) noexcept : m_hSCManager(nullptr)
-{
-    m_hSCManager = OpenSCManager(
+CSvrCtrl::CSvrCtrl(void) noexcept : m_hSCManager(OpenSCManager(
     nullptr,                 // local machine
     nullptr,                 // ServicesActive database
-    SC_MANAGER_ALL_ACCESS);  // full access rights
+    SC_MANAGER_ALL_ACCESS))  // full access rights
+{
 }
 
 CSvrCtrl::~CSvrCtrl(void)

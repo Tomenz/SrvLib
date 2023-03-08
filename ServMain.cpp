@@ -109,7 +109,7 @@ public:
     {
         struct EnableMaker : public Service
         {
-            EnableMaker(const SrvParam* SrvPara = nullptr) : Service(SrvPara) {}
+            explicit EnableMaker(const SrvParam* SrvPara = nullptr) : Service(SrvPara) {}
             using Service::Service;
         };
         return make_unique<EnableMaker>(SrvPara);
