@@ -499,8 +499,6 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
         close(STDIN_FILENO);
         close(STDOUT_FILENO);
         close(STDERR_FILENO);
-
-        syslog(LOG_NOTICE, "%s", string(strSrvName + " gestoppt").c_str());
 #endif
         Service::GetInstance(&SrvPara);
         iRet = Service::GetInstance().Run();
