@@ -475,7 +475,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
         //We got a good pid, Close the Parent Process
         if (pid > 0)
-            exit(EXIT_SUCCESS);
+            return iRet;
 
         //Create a new Signature Id for our child
         pid_t sid = setsid();
@@ -490,7 +490,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
         //We got a good pid, Close the Parent Process
         if (pid > 0)
-            exit(EXIT_SUCCESS);
+            return iRet;
 
         //Change File Mask
         umask(0);
@@ -504,7 +504,9 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 #endif
         Service::GetInstance(&SrvPara);
         iRet = Service::GetInstance().Run();
-
+#if !defined(_WIN32) && !defined(_WIN64)
+        syslog(LOG_NOTICE, "%s", string(strSrvName + " gestoppt").c_str());
+#endif
     }
 
     return iRet;

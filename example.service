@@ -1,9 +1,13 @@
+# cmake should replace the ~ with the path
+# if cmake is not used, replace the ~ wir the correct path
+# uncomment the needed items in this file
+
 [Unit]
 Description=Some Example server
 # After=remote-fs.target memcached.service
 After=syslog.target
 # Requires=memcached.service
-# AssertPathExists=/home/thomas
+# AssertPathExists=/home/pi
 # StartLimitBurst=5
 # StartLimitIntervalSec=10
 
@@ -11,16 +15,16 @@ After=syslog.target
 Type=forking
 # Restart=on-failure
 # RestartSec=1
-User=root
+# User=root
 # Group=thomas
-ExecStart=/home/thomas/c++/SrvLib/build/ExampleSrv
-ExecReload=/home/thomas/c++/SrvLib/build/ExampleSrv -k
+ExecStart=~/ExampleSrv
+ExecReload=~/ExampleSrv -k
 # ExecStop=/bin/kill -WINCH ${MAINPID}
 KillSignal=SIGTERM
 
 # Nice=0
 # PrivateTmp=yes
-KillMode=mixed
+# KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

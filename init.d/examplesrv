@@ -8,8 +8,10 @@
 # Description:       <DESCRIPTION>
 ### END INIT INFO
 
+# cmake should replace the ~ with the path
+# if cmake is not used, replace the ~ wir the correct path
 NAME=ExampleSrv
-DAEMON=/home/thomas/c++/SrvLib/build/$NAME
+DAEMON=~/$NAME
 RUNAS=root
 
 PIDDIR=/var/run/$NAME

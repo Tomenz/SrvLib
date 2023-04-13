@@ -34,5 +34,12 @@ if (NOT MSVC)
     target_link_libraries(ExampleSrv pthread)
 endif()
 
+file(READ init.d/examplesrv FILE_CONTENTS)
+string(REPLACE "~" ${CMAKE_CURRENT_BINARY_DIR} NEW_FILE_CONTENTS ${FILE_CONTENTS})
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/examplesrv ${NEW_FILE_CONTENTS})
+
+file(READ example.service FILE_CONTENTS)
+string(REPLACE "~" ${CMAKE_CURRENT_BINARY_DIR} NEW_FILE_CONTENTS ${FILE_CONTENTS})
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/example.service ${NEW_FILE_CONTENTS})
+
 install(TARGETS srvlib DESTINATION lib)
-#install(FILES SocketLib.h DESTINATION include)
