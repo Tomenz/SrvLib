@@ -19,8 +19,7 @@ On Windows there are commandline option to install,remove,start and stop the ser
     -k   Reload configuration
     -h   Show this help
 
-# Linux
-# systemd
+# Linux - systemd
 
     Rename an copy the example.service after editing file to /etc/systemd/system/
     Reload the systemd as root with: systemctl daemon-reload
@@ -31,8 +30,7 @@ On Windows there are commandline option to install,remove,start and stop the ser
     To start the service, run as root: systemctl start example
     To stop the service, run as root: systemctl stop example
 
-
-# init.d
+# Linux - init.d
 Copy the file in the init.d directory to /etc/init.d/ and rename it, modify the execution rights, and change the application name and the path for the application in that file.
 
 commanline option are:
