@@ -92,14 +92,12 @@ public:
 
     static void SignalHandler(int iSignal)
     {
-        signal(iSignal, Service::SignalHandler);
-
-        if (iSignal == SIGTERM)
-            Service::GetInstance().Stop();
 #if defined(_WIN32) || defined(_WIN64)
-        else if (iSignal == SIGINT)
+        if (iSignal == SIGINT)
             Service::GetInstance().CallSignalCallback();
 #else
+        if (iSignal == SIGCHLD)
+            Service::GetInstance().Stop();
         else if (iSignal == SIGHUP)
             Service::GetInstance().CallSignalCallback();
 #endif
@@ -147,7 +145,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
     signal(SIGINT, Service::SignalHandler);
 #else
     signal(SIGHUP, Service::SignalHandler);
-    signal(SIGTERM, Service::SignalHandler);
+    signal(SIGCHLD, Service::SignalHandler);
 
     auto _kbhit = []() -> int
     {

@@ -18,9 +18,9 @@ Type=forking
 # User=root
 # Group=thomas
 ExecStart=~/ExampleSrv
-ExecReload=~/ExampleSrv -k
-# ExecStop=/bin/kill -WINCH ${MAINPID}
-KillSignal=SIGTERM
+ExecReload=/bin/kill -SIGHUP ${MAINPID}
+ExecStop=/bin/kill -SIGCHLD ${MAINPID}
+# KillSignal=SIGTERM
 
 # Nice=0
 # PrivateTmp=yes
