@@ -96,7 +96,7 @@ public:
         if (iSignal == SIGINT)
             Service::GetInstance().CallSignalCallback();
 #else
-        if (iSignal == SIGCHLD)
+        if (iSignal == SIGQUIT)
             Service::GetInstance().Stop();
         else if (iSignal == SIGHUP)
             Service::GetInstance().CallSignalCallback();
@@ -145,7 +145,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
     signal(SIGINT, Service::SignalHandler);
 #else
     signal(SIGHUP, Service::SignalHandler);
-    signal(SIGCHLD, Service::SignalHandler);
+    signal(SIGQUIT, Service::SignalHandler);
 
     auto _kbhit = []() -> int
     {
@@ -490,6 +490,14 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
         if (pid > 0)
             return iRet;
 
+        int fdPidFile = open(std::string("/var/run/" + strSrvName + ".pid").c_str(), O_CREAT | O_RDWR, S_IRWXU | S_IRWXG  | S_IRWXO);
+        if (fdPidFile >= 0)
+        {
+            std::string strTmp = std::to_string(getpid()) + "\n";
+            write(fdPidFile, strTmp.c_str(), strTmp.size());
+            close(fdPidFile);
+        }
+
         //Change File Mask
         umask(0);
 
@@ -502,6 +510,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
         iRet = Service::GetInstance().Run();
 #if !defined(_WIN32) && !defined(_WIN64)
         syslog(LOG_NOTICE, "%s", string(strSrvName + " gestoppt").c_str());
+        unlink(std::string("/var/run/" + strSrvName + ".pid").c_str());
 #endif
     }
 
