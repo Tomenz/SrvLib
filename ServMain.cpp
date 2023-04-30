@@ -147,6 +147,15 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
     signal(SIGHUP, Service::SignalHandler);
     signal(SIGQUIT, Service::SignalHandler);
 
+    auto fnWS2S = [](const wstring& src) -> string
+    {
+        string strDst(src.size() * 4, 0);
+        size_t nWritten = wcstombs(&strDst[0], src.c_str(), src.size() * 4);
+        strDst.resize(nWritten > 0 && nWritten < src.size() * 4 ? nWritten : 0);
+        return strDst;
+    };
+    string strSrvName = fnWS2S(SrvPara.szSrvName);
+
     auto _kbhit = []() -> int
     {
         struct termios oldt, newt;
@@ -173,6 +182,61 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
         return 0;
     };
+
+    auto fnSendSignal = [](int iSignal)
+    {
+        pid_t nMyId = getpid();
+        string strMyName(64, 0);
+        FILE* fp = fopen("/proc/self/comm", "r");
+        if (fp)
+        {
+            if (fgets(&strMyName[0], strMyName.size(), fp) != NULL)
+            {
+                strMyName.erase(strMyName.find_last_not_of('\0') + 1);
+                strMyName.erase(strMyName.find_last_not_of('\n') + 1);
+            }
+            fclose(fp);
+        }
+
+        DIR* dir = opendir("/proc");
+        if (dir != nullptr)
+        {
+            struct dirent* ent;
+            char* endptr;
+
+            while ((ent = readdir(dir)) != NULL)
+            {
+                // if endptr is not a null character, the directory is not entirely numeric, so ignore it
+                long lpid = strtol(ent->d_name, &endptr, 10);
+                if (*endptr != '\0')
+                    continue;
+
+                // if the number is our own pid we ignore it
+                if ((pid_t)lpid == nMyId)
+                    continue;
+
+                // try to open the cmdline file
+                FILE* fp = fopen(string("/proc/" + to_string(lpid) + "/comm").c_str(), "r");
+                if (fp != nullptr)
+                {
+                    string strName(64, 0);
+                    if (fgets(&strName[0], strName.size(), fp) != NULL)
+                    {
+                        strName.erase(strName.find_last_not_of('\0') + 1);
+                        strName.erase(strName.find_last_not_of('\n') + 1);
+                        if (strName == strMyName)
+                        {
+                            //wcout << strName.c_str() << L" = " << (pid_t)lpid << endl;
+                            kill((pid_t)lpid, iSignal);
+                            break;
+                        }
+                    }
+                    fclose(fp);
+                }
+            }
+            closedir(dir);
+        }
+    };
 #endif
 
     int iRet{0};
@@ -195,9 +259,18 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                 case 'S':
                     iRet = CSvrCtrl().Start(SrvPara.szSrvName);
                     break;
+#endif
                 case 'E':
+#if defined(_WIN32) || defined(_WIN64)
                     iRet = CSvrCtrl().Stop(SrvPara.szSrvName);
+#else
+                    fnSendSignal(SIGQUIT);
+                    struct stat st;
+                    while (stat(std::string("/var/run/" + strSrvName + ".pid").c_str(), &st) == 0)
+                        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+#endif
                     break;
+#if defined(_WIN32) || defined(_WIN64)
                 case 'P':
                     iRet = CSvrCtrl().Pause(SrvPara.szSrvName);
                     break;
@@ -375,57 +448,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                         }
                     }
 #else
-                    pid_t nMyId = getpid();
-                    string strMyName(64, 0);
-                    FILE* fp = fopen("/proc/self/comm", "r");
-                    if (fp)
-                    {
-                        if (fgets(&strMyName[0], strMyName.size(), fp) != NULL)
-                        {
-                            strMyName.erase(strMyName.find_last_not_of('\0') + 1);
-                            strMyName.erase(strMyName.find_last_not_of('\n') + 1);
-                        }
-                        fclose(fp);
-                    }
-
-                    DIR* dir = opendir("/proc");
-                    if (dir != nullptr)
-                    {
-                        struct dirent* ent;
-                        char* endptr;
-
-                        while ((ent = readdir(dir)) != NULL)
-                        {
-                            // if endptr is not a null character, the directory is not entirely numeric, so ignore it
-                            long lpid = strtol(ent->d_name, &endptr, 10);
-                            if (*endptr != '\0')
-                                continue;
-
-                            // if the number is our own pid we ignore it
-                            if ((pid_t)lpid == nMyId)
-                                continue;
-
-                            // try to open the cmdline file
-                            FILE* fp = fopen(string("/proc/" + to_string(lpid) + "/comm").c_str(), "r");
-                            if (fp != nullptr)
-                            {
-                                string strName(64, 0);
-                                if (fgets(&strName[0], strName.size(), fp) != NULL)
-                                {
-                                    strName.erase(strName.find_last_not_of('\0') + 1);
-                                    strName.erase(strName.find_last_not_of('\n') + 1);
-                                    if (strName == strMyName)
-                                    {
-                                        //wcout << strName.c_str() << L" = " << (pid_t)lpid << endl;
-                                        kill((pid_t)lpid, SIGHUP);
-                                        break;
-                                    }
-                                }
-                                fclose(fp);
-                            }
-                        }
-                        closedir(dir);
-                    }
+                    fnSendSignal(SIGHUP);
 #endif
                 }
                 break;
@@ -451,14 +474,6 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
     else
     {
 #if !defined(_WIN32) && !defined(_WIN64)
-        function<string(const wstring&)> fnWS2S = [](const wstring& src) -> string
-        {
-            string strDst(src.size() * 4, 0);
-            size_t nWritten = wcstombs(&strDst[0], src.c_str(), src.size() * 4);
-            strDst.resize(nWritten > 0 && nWritten < src.size() * 4 ? nWritten : 0);
-            return strDst;
-        };
-        string strSrvName = fnWS2S(SrvPara.szSrvName);
         //Set our Logging Mask and open the Log
         setlogmask(LOG_UPTO(LOG_NOTICE));
         openlog(strSrvName.c_str(), LOG_CONS | LOG_NDELAY | LOG_PERROR | LOG_PID, LOG_USER);
