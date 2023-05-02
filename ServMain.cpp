@@ -155,6 +155,8 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
         return strDst;
     };
     string strSrvName = fnWS2S(SrvPara.szSrvName);
+    char* szEnv = getenv("RUNTIME_DIRECTORY");
+    string strRunTimeDir = szEnv != nullptr ? szEnv : "/var/run/";
 
     auto _kbhit = []() -> int
     {
@@ -266,7 +268,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 #else
                     fnSendSignal(SIGQUIT);
                     struct stat st;
-                    while (stat(std::string("/var/run/" + strSrvName + ".pid").c_str(), &st) == 0)
+                    while (stat(std::string(strRunTimeDir + "/" + strSrvName + ".pid").c_str(), &st) == 0)
                         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 #endif
                     break;
@@ -505,7 +507,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
         if (pid > 0)
             return iRet;
 
-        int fdPidFile = open(std::string("/var/run/" + strSrvName + ".pid").c_str(), O_CREAT | O_RDWR, S_IRWXU | S_IRWXG  | S_IRWXO);
+        int fdPidFile = open(std::string(strRunTimeDir + "/" + strSrvName + ".pid").c_str(), O_CREAT | O_RDWR, S_IRWXU | S_IRWXG  | S_IRWXO);
         if (fdPidFile >= 0)
         {
             std::string strTmp = std::to_string(getpid()) + "\n";
@@ -525,7 +527,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
         iRet = Service::GetInstance().Run();
 #if !defined(_WIN32) && !defined(_WIN64)
         syslog(LOG_NOTICE, "%s", string(strSrvName + " gestoppt").c_str());
-        unlink(std::string("/var/run/" + strSrvName + ".pid").c_str());
+        unlink(std::string(strRunTimeDir + "/" + strSrvName + ".pid").c_str());
 #endif
     }
 
