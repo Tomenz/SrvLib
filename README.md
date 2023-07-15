@@ -22,14 +22,15 @@ On Windows there are commandline option to install,remove,start and stop the ser
 
 # Linux - systemd
 
-    Rename an copy the example.service after editing file to /etc/systemd/system/
+    Rename an copy the example.service file after editing to /etc/systemd/system/
     Reload the systemd as root with: systemctl daemon-reload
     
     IN THE NEXT COMMANDS USE THE NAME OF THE RENAMED "example" FILE!
     
-    Enable the auto start run this command as root: systemctl enable example
-    To start the service, run as root: systemctl start example
-    To stop the service, run as root: systemctl stop example
+    Enable the auto start run this command as root: systemctl enable example.service
+    To start the service, run as root: systemctl start example.service
+    To stop the service, run as root: systemctl stop example.service
+    To reload the what ever, run as root: systemctl reload example.service
 
 # Linux - init.d
 Copy the file in the init.d directory to /etc/init.d/ and rename it, modify the execution rights, and change the application name and the path for the application in that file.
