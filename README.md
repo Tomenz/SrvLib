@@ -4,6 +4,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/73915c0f4be040198b0ebdd0466f34b9)](https://app.codacy.com/gh/Tomenz/SrvLib?utm_source=github.com&utm_medium=referral&utm_content=Tomenz/SrvLib&utm_campaign=Badge_Grade)
 [![Build status](https://ci.appveyor.com/api/projects/status/871d8ynr5qwu589h?svg=true)](https://ci.appveyor.com/project/Tomenz/srvlib)
 [![CodeQL](https://github.com/Tomenz/SrvLib/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tomenz/SrvLib/actions/workflows/codeql.yml)
+[![CMake](https://github.com/Tomenz/SrvLib/actions/workflows/cmake.yml/badge.svg)](https://github.com/Tomenz/SrvLib/actions/workflows/cmake.yml)
 
 A plugin library to make your console application a windows system service, or a linux daemon service
 
