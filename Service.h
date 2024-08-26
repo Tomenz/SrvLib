@@ -16,6 +16,6 @@ typedef struct
     std::function<void()> fnSignalCallBack;
 }SrvParam;
 
-int ServiceMain(int argc, const char* argv[], const SrvParam& SvPara);
+int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara);
 
-#endif // !SERVICE_H
+#endif // SERVICE_H

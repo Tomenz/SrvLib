@@ -10,6 +10,7 @@
    Email:   Thomas@fam-hauck.de
 */
 
+#if defined(_WIN32) || defined(_WIN64)
 #include "BaseSrv.h"
 
 wstring               CBaseSrv::s_strSrvName;
@@ -124,3 +125,5 @@ void WINAPI CBaseSrv::ServiceCtrlHandler(DWORD Opcode)
 
     return;
 }
+
+#endif

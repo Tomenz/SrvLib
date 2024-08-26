@@ -13,6 +13,7 @@
 #ifndef SVRCTRL_H
 #define SVRCTRL_H
 
+#if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 
 class CSvrCtrl
@@ -39,5 +40,6 @@ private:
 private:
     SC_HANDLE m_hSCManager;
 };
+#endif
 
 #endif // !SVRCTRL_H

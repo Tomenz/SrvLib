@@ -13,6 +13,7 @@
 #ifndef BASESRV_H
 #define BASESRV_H
 
+#if defined(_WIN32) || defined(_WIN64)
 #include "windows.h"
 #include <string>
 
@@ -45,5 +46,6 @@ private:
     static SERVICE_STATUS_HANDLE s_hSrvStatus;
     static CBaseSrv*             s_This;
 };
+#endif
 
-#endif // !BASESRV_H
+#endif // BASESRV_H

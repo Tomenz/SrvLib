@@ -10,8 +10,10 @@
    Email:   Thomas@fam-hauck.de
 */
 
-#include <string>
+#if defined(_WIN32) || defined(_WIN64)
 #include "SrvCtrl.h"
+
+#include <string>
 #include <VersionHelpers.h>
 
 using namespace std;
@@ -355,3 +357,4 @@ bool CSvrCtrl::SelfElevat()
 
     return true;
 }
+#endif

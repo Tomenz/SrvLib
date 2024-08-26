@@ -10,6 +10,8 @@
    Email:   Thomas@fam-hauck.de
 */
 
+#include "Service.h"
+
 #include <string>
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
@@ -20,8 +22,6 @@
 #include <syslog.h>
 #include <unistd.h>
 #endif
-
-#include "Service.h"
 
 int main(int argc, const char* argv[])
 {

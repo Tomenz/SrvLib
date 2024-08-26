@@ -10,14 +10,15 @@
    Email:   Thomas@fam-hauck.de
 */
 
+#include "Service.h"
+
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
-#include <signal.h>
+#include <csignal>
 
-#include "Service.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
@@ -60,7 +61,7 @@ public:
         return *s_pInstance;
     }
 
-    void Start(void) override
+    void Start() override
     {
         m_bIsStopped = false;
 
@@ -76,7 +77,7 @@ public:
         m_bIsStopped = true;
     }
 
-    void Stop(void) noexcept override
+    void Stop() noexcept override
     {
         m_bStop = true;
         m_cvStop.notify_all();
@@ -88,7 +89,7 @@ public:
             fnSignalCallBack();
     }
 
-    bool IsStopped(void) noexcept { return m_bIsStopped; }
+    bool IsStopped() noexcept { return m_bIsStopped; }
 
     static void SignalHandler(int iSignal)
     {
@@ -187,7 +188,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
 
     auto fnSendSignal = [](int iSignal)
     {
-        pid_t nMyId = getpid();
+        const pid_t nMyId = getpid();
         string strMyName(64, 0);
         FILE* fp = fopen("/proc/self/comm", "r");
         if (fp)
@@ -214,7 +215,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                     continue;
 
                 // if the number is our own pid we ignore it
-                if ((pid_t)lpid == nMyId)
+                if (static_cast<pid_t>(lpid) == nMyId)
                     continue;
 
                 // try to open the cmdline file
@@ -229,7 +230,7 @@ int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
                         if (strName == strMyName)
                         {
                             //wcout << strName.c_str() << L" = " << (pid_t)lpid << endl;
-                            kill((pid_t)lpid, iSignal);
+                            kill(static_cast<pid_t>(lpid), iSignal);
                             break;
                         }
                     }
