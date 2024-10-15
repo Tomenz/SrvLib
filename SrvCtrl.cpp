@@ -108,11 +108,11 @@ int CSvrCtrl::Start(const wchar_t* szSvrName)
     if (SelfElevat() == true)
         return 0;
 
-    SC_HANDLE schService = nullptr;
-    SERVICE_STATUS_PROCESS ssStatus = { 0 };
-    DWORD dwOldCheckPoint = 0;
-    DWORD dwStartTickCount = 0;
-    DWORD dwBytesNeeded = 0;
+    SC_HANDLE schService{ nullptr };
+    SERVICE_STATUS_PROCESS ssStatus{ 0 };
+    DWORD dwOldCheckPoint{ 0 };
+    DWORD dwStartTickCount{ 0 };
+    DWORD dwBytesNeeded{ 0 };
 
     schService = OpenService(m_hSCManager, szSvrName, SERVICE_ALL_ACCESS);
 
@@ -203,7 +203,7 @@ int CSvrCtrl::Stop(const wchar_t* szSvrName)
     if (schService == nullptr)
         return -5;
 
-    DWORD dwError = 0;
+    DWORD dwError{ 0 };
     SERVICE_STATUS ssStatus;
     if (ControlService(schService, SERVICE_CONTROL_STOP, &ssStatus) == 0)
         dwError = GetLastError();
@@ -222,7 +222,7 @@ int CSvrCtrl::Pause(const wchar_t* szSvrName)
     if (schService == nullptr)
         return -5;
 
-    DWORD dwError = 0;
+    DWORD dwError{ 0 };
     SERVICE_STATUS ssStatus;
     if (ControlService(schService, SERVICE_CONTROL_PAUSE, &ssStatus) == 0)
         dwError = GetLastError();
@@ -241,7 +241,7 @@ int CSvrCtrl::Continue(const wchar_t* szSvrName)
     if (schService == nullptr)
         return -5;
 
-    DWORD dwError = 0;
+    DWORD dwError{ 0 };
     SERVICE_STATUS ssStatus;
     if (ControlService(schService, SERVICE_CONTROL_CONTINUE, &ssStatus) == 0)
         dwError = GetLastError();
@@ -284,7 +284,7 @@ bool CSvrCtrl::SetServiceDescription(const wchar_t* szSvrName, const wchar_t* sz
     }
 
     // The database is locked, so it is safe to make changes.
-    bool bRet = true;
+    bool bRet{ true};
 
     // Open a handle to the service.
     SC_HANDLE schService = OpenService(m_hSCManager, szSvrName, SERVICE_CHANGE_CONFIG); // need CHANGE access
@@ -319,9 +319,9 @@ bool CSvrCtrl::SelfElevat()
         return false;
 
     // check if elevated on Vista and 7
-    HANDLE Token = nullptr;
-    TOKEN_ELEVATION Elevation = { 0 };  // Token type only available with Vista/7
-    DWORD ReturnSize = 0;
+    HANDLE Token{ nullptr };
+    TOKEN_ELEVATION Elevation{ 0 };  // Token type only available with Vista/7
+    DWORD ReturnSize{ 0 };
 
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_READ, &Token) ||
         !GetTokenInformation(Token, TokenElevation, &Elevation, sizeof(Elevation), &ReturnSize))
