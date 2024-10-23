@@ -56,6 +56,10 @@ class Service : public CBaseSrv
 public:
     static Service& GetInstance(const SrvParam* SrvPara = nullptr)
     {
+        if (SrvPara == nullptr && s_pInstance == nullptr)
+            throw std::runtime_error("Wrong init, the first call to GetInstance must have a address of a SrvPara struct");
+        if (SrvPara == nullptr)
+            return *s_pInstance;
         if (s_pInstance == nullptr)
             s_pInstance = Service::factory(SrvPara);
         return *s_pInstance;
