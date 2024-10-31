@@ -19,9 +19,16 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
 	add_compile_options("-Wall" "-Wpedantic" "-Wextra" "-fexceptions")
     endif()
 else()
-    message(STATUS "CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD} set by parent project.")
+    message(STATUS "${PROJECT_NAME}: CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD} set by parent project.")
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+string(FIND "${CMAKE_CXX_FLAGS_DEBUG}" "-O0" nPos)
+if(${nPos} EQUAL "-1")
+  SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3 -ggdb -D_DEBUG -DDEBUG")
+else()
+  message(STATUS "${PROJECT_NAME}: CMAKE_CXX_FLAGS_DEBUG hat bereits -O0 enthalten")
+endif()
 
 set(targetSrc
     ${CMAKE_CURRENT_LIST_DIR}/ServMain.cpp
