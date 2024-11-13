@@ -99,7 +99,10 @@ public:
     {
 #if defined(_WIN32) || defined(_WIN64)
         if (iSignal == SIGINT)
+        {
             Service::GetInstance().CallSignalCallback();
+            signal(SIGINT, Service::SignalHandler);
+        }
 #else
         if (iSignal == SIGQUIT)
             Service::GetInstance().Stop();
