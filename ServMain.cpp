@@ -147,7 +147,7 @@ DWORD WINAPI RemoteThreadProc(LPVOID/* lpParameter*/) noexcept
 }
 #endif
 
-int ServiceMain(int argc, const char* argv[], const SrvParam& SrvPara)
+int ServiceMain(int argc, char* argv[], const SrvParam& SrvPara)
 {
 #if defined(_WIN32) || defined(_WIN64)
     signal(SIGINT, Service::SignalHandler);
