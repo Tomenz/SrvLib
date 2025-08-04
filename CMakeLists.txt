@@ -29,24 +29,18 @@ else()
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(srvlib STATIC)
+set(targetSrc
+    ${CMAKE_CURRENT_LIST_DIR}/ServMain.cpp
+)
 
-set(targetSrc "${CMAKE_CURRENT_SOURCE_DIR}/ServMain.cpp")
 if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") OR WIN32)
 list(APPEND targetSrc
-    "${CMAKE_CURRENT_SOURCE_DIR}/BaseSrv.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/BaseSrv.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/SrvCtrl.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/SrvCtrl.h"
+    ${CMAKE_CURRENT_LIST_DIR}/SrvCtrl.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/BaseSrv.cpp
 )
 endif()
 
-target_sources(srvlib
-    PRIVATE ${targetSrc}
-    PUBLIC FILE_SET HEADERS
-    BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
-    FILES Service.h
-)
+add_library(srvlib STATIC ${targetSrc})
 
 if(PROJECT_IS_TOP_LEVEL)
     add_executable(ExampleSrv  ExampleSrv.cpp)
