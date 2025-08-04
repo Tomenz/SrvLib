@@ -23,7 +23,7 @@
 #include <unistd.h>
 #endif
 
-int main(int argc, const char* argv[])
+int main(int argc, char* argv[])
 {
     SrvParam svParam;
 #if defined(_WIN32) || defined(_WIN64)
