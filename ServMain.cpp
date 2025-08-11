@@ -23,6 +23,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #include <VersionHelpers.h>
+#include <shellapi.h>
 #include <conio.h>
 #include "BaseSrv.h"
 #include "SrvCtrl.h"
