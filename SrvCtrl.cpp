@@ -13,6 +13,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include "SrvCtrl.h"
 
+#include <shellapi.h>
 #include <string>
 #include <VersionHelpers.h>
 
