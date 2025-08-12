@@ -65,4 +65,6 @@ if(PROJECT_IS_TOP_LEVEL)
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/example.service ${NEW_FILE_CONTENTS})
 
     install(TARGETS srvlib DESTINATION lib)
+else()
+    target_include_directories(srvlib PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 endif()
